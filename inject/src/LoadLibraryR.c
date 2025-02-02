@@ -144,8 +144,6 @@ HMODULE WINAPI LoadLibraryR( LPVOID lpBuffer, DWORD dwLength )
 	if( lpBuffer == NULL || dwLength == 0 )
 		return NULL;
 
-	__try
-	{
 		// check if the library has a ReflectiveLoader...
 		dwReflectiveLoaderOffset = GetReflectiveLoaderOffset( lpBuffer );
 		if( dwReflectiveLoaderOffset != 0 )
@@ -168,11 +166,6 @@ HMODULE WINAPI LoadLibraryR( LPVOID lpBuffer, DWORD dwLength )
 				VirtualProtect( lpBuffer, dwLength, dwOldProtect1, &dwOldProtect2 );
 			}
 		}
-	}
-	__except( EXCEPTION_EXECUTE_HANDLER )
-	{
-		hResult = NULL;
-	}
 
 	return hResult;
 }
@@ -194,8 +187,6 @@ HANDLE WINAPI LoadRemoteLibraryR( HANDLE hProcess, LPVOID lpBuffer, DWORD dwLeng
 	DWORD dwReflectiveLoaderOffset            = 0;
 	DWORD dwThreadId                          = 0;
 
-	__try
-	{
 		do
 		{
 			if( !hProcess  || !lpBuffer || !dwLength )
@@ -219,15 +210,9 @@ HANDLE WINAPI LoadRemoteLibraryR( HANDLE hProcess, LPVOID lpBuffer, DWORD dwLeng
 			lpReflectiveLoader = (LPTHREAD_START_ROUTINE)( (ULONG_PTR)lpRemoteLibraryBuffer + dwReflectiveLoaderOffset );
 
 			// create a remote thread in the host process to call the ReflectiveLoader!
-			hThread = CreateRemoteThread( hProcess, NULL, 1024*1024, lpReflectiveLoader, lpParameter, (DWORD)NULL, &dwThreadId );
+			hThread = CreateRemoteThread( hProcess, NULL, 1024*1024, lpReflectiveLoader, lpParameter, (DWORD_PTR)NULL, &dwThreadId );
 
 		} while( 0 );
-
-	}
-	__except( EXCEPTION_EXECUTE_HANDLER )
-	{
-		hThread = NULL;
-	}
 
 	return hThread;
 }

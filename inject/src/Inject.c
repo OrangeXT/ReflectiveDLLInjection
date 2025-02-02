@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "LoadLibraryR.h"
+#define WIN_X64
 
 #pragma comment(lib,"Advapi32.lib")
 
@@ -47,14 +48,15 @@ int main( int argc, char * argv[] )
 	DWORD dwBytesRead     = 0;
 	DWORD dwProcessId     = 0;
 	TOKEN_PRIVILEGES priv = {0};
+	char * cpDllFile  = NULL;
 
 #ifdef WIN_X64
-	char * cpDllFile  = "reflective_dll.x64.dll";
+	cpDllFile  = "reflective_dll.x64.dll";
 #else
 #ifdef WIN_X86
-	char * cpDllFile  = "reflective_dll.dll";
-#else WIN_ARM
-	char * cpDllFile  = "reflective_dll.arm.dll";
+	cpDllFile  = "reflective_dll.dll";
+#elif defined(WIN_ARM)
+	cpDllFile  = "reflective_dll.arm.dll";
 #endif
 #endif
 

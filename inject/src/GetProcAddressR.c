@@ -39,9 +39,6 @@ FARPROC WINAPI GetProcAddressR( HANDLE hModule, LPCSTR lpProcName )
 
 	// a module handle is really its base address
 	uiLibraryAddress = (UINT_PTR)hModule;
-
-	__try
-	{
 		UINT_PTR uiAddressArray = 0;
 		UINT_PTR uiNameArray    = 0;
 		UINT_PTR uiNameOrdinals = 0;
@@ -67,12 +64,12 @@ FARPROC WINAPI GetProcAddressR( HANDLE hModule, LPCSTR lpProcName )
 		uiNameOrdinals = ( uiLibraryAddress + pExportDirectory->AddressOfNameOrdinals );
 
 		// test if we are importing by name or by ordinal...
-		if( ((DWORD)lpProcName & 0xFFFF0000 ) == 0x00000000 )
+		if( ((ULONG_PTR)lpProcName & 0xFFFF0000 ) == 0x00000000 )
 		{
 			// import by ordinal...
 
 			// use the import ordinal (- export ordinal base) as an index into the array of addresses
-			uiAddressArray += ( ( IMAGE_ORDINAL( (DWORD)lpProcName ) - pExportDirectory->Base ) * sizeof(DWORD) );
+			uiAddressArray += ( ( IMAGE_ORDINAL( (ULONG_PTR)lpProcName ) - pExportDirectory->Base ) * sizeof(DWORD) );
 
 			// resolve the address for this imported function
 			fpResult = (FARPROC)( uiLibraryAddress + DEREF_32(uiAddressArray) );
@@ -105,12 +102,6 @@ FARPROC WINAPI GetProcAddressR( HANDLE hModule, LPCSTR lpProcName )
 				uiNameOrdinals += sizeof(WORD);
 			}
 		}
-	}
-	__except( EXCEPTION_EXECUTE_HANDLER )
-	{
-		fpResult = NULL;
-	}
-
 	return fpResult;
 }
 //===============================================================================================//
